@@ -80,3 +80,102 @@ def main():
 main()
 
 
+
+
+#Steven Johnston
+#04/20/2018
+#CSC110
+#Section D
+
+#This program simulates a fire utilizing a list of lists to output the
+#the simulation. This program utilizes drawing panel to illustrate graphically
+#how a fire might spread according to the progagation percentage. #This program
+
+
+from DrawingPanel import*
+import random
+SIZE = 75
+
+#This function reads in the text file given, and turns it into a list of lists
+#so to be iterated through, and ultimately simulate the fire.
+def fire(map_lines):
+    grid = []
+    for line in map_lines:
+        clean_line = line.strip().split()
+        grid.append(clean_line)
+    return grid
+
+#This function takes in the previous list as a parameter, and utilizes
+#conditionals to determine how, and if the fire will spread. It also copies
+#the old list into a new one so to output the fire correctly. The function looks
+#for '1's, and checks for the values that are north, south, east, and west of
+#the value at [i][j] respectively. A random int, and the propagation percentage
+#determine whether the fire will spread. All '2's become '0's on the next turn
+#since they burn up in correlation to the spec. 
+def fire_spread(grid_actual_old):
+    grid_actual = grid_actual_old.copy()
+    for i in range(0, len(grid_actual)):
+        for j in range(0, len(grid_actual[i])):
+            if grid_actual[i][j] == '1':
+                propagation = (random.randint(0, 100))
+                if grid_actual[i - 1][j] == '2':
+                    if propagation < SIZE:
+                        grid_actual[i][j] = '2'
+                            
+                elif grid_actual[i + 1][j] == '2':
+                    if propagation < SIZE:
+                        grid_actual[i][j] = '2'
+                                
+                elif grid_actual[i][j - 1] == '2':
+                    if propagation < SIZE:
+                        grid_actual[i][j] = '2'
+                                
+                elif grid_actual[i][j + 1] == '2':
+                    if propagation < SIZE:
+                        grid_actual[i][j] = '2'
+                                                       
+            elif grid_actual[i][j] == '2':
+                    grid_actual[i][j] = '0'
+        
+    return grid_actual
+
+#This function sorts through the grid checking for '2's. When it no longer finds
+#any '2's in the list, it will return False, and stop the simulation.
+def still_burning(lis):
+    for i in range(len(lis)):
+        for j in range(len(lis[i])):
+            if lis[i][j] == '2':
+                return True
+    return False
+
+#This function takes all the ouput, and draws it on the drawing panel. It draws
+#it according to the spec. The panel is draw by the length of the grid times 10
+#as well as the squares.
+def draw_fire(p, grid_actual):
+    p.sleep(1000)
+    for i in range(len(grid_actual)):
+        for j in range(len(grid_actual[i])):
+            if grid_actual[i][j] == '0':
+                p.fill_rect(j * 10, i * 10, 10, 10, "grey")
+            elif grid_actual[i][j] == '1':
+                p.fill_rect(j * 10, i * 10, 10, 10, "green")
+            elif grid_actual[i][j] == '2':
+                p.fill_rect(j * 10, i * 10, 10, 10, "red")
+                
+
+def main(): 
+    one_text = input("File name? ")
+    file = open(one_text)
+    lines = file.readlines()    
+    actual_grid = fire(lines)
+    p = DrawingPanel(len(actual_grid) * 10, len(actual_grid[0]) * 10)
+
+    while still_burning(actual_grid):
+        grid_actual = fire_spread(actual_grid)
+        draw_fire(p, grid_actual)
+
+    
+main()
+
+
+
